@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-[#faf8f5]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PsicAPP • Consultório de Psicologia</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        gold: {
+                            50: '#fdfbf7',
+                            100: '#f7f1e3',
+                            200: '#eee0c0',
+                            300: '#e2ca93',
+                            400: '#d4af37',
+                            500: '#c59b27',
+                            600: '#b0831d',
+                            700: '#8e6518',
+                            800: '#735019',
+                            900: '#5e4219',
+                        },
+                        pastel: {
+                            bg: '#faf8f5',
+                            card: '#ffffff',
+                            border: '#ece6d8',
+                            accent: '#f4efe6',
+                            subtle: '#fdfbf7'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #faf8f5;
+            color: #334155;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .gold-gradient, .psi-gold-gradient {
+            background: linear-gradient(135deg, #d4af37 0%, #c59b27 100%);
+        }
+
+        #topHeader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            z-index: 40;
+            background-color: #ffffff;
+            border-bottom: 1px solid #ece6d8;
+        }
+
+        #mainSidebar {
+            position: fixed;
+            top: 64px;
+            bottom: 0;
+            left: 0;
+            z-index: 30;
+            background-color: #ffffff;
+            border-right: 1px solid #ece6d8;
+            transition: transform 0.3s ease, width 0.3s ease;
+        }
+
+        #mainWrapper {
+            padding-top: 64px;
+            transition: padding-left 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            #mainWrapper.sidebar-expanded {
+                padding-left: 240px;
+            }
+            #mainWrapper.sidebar-collapsed {
+                padding-left: 72px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            #mainWrapper {
+                padding-left: 0 !important;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #faf8f5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e2ca93;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c59b27;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col antialiased selection:bg-gold-200 selection:text-gold-900">
+
+    <!-- TELA DE LOGIN (PIN UNICO) -->
+    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#faf8f5] p-4">
+        <div class="w-full max-w-sm bg-white rounded-3xl border border-pastel-border shadow-xl p-8 text-center space-y-6">
+            <div class="space-y-2">
+                <div class="w-16 h-16 mx-auto rounded-2xl gold-gradient flex items-center justify-center text-white text-3xl font-extrabold shadow-md">
+                    Ψ
+                </div>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight">PsicAPP</h1>
+                <p class="text-xs text-slate-500">Consultório de Psicologia • LGPD Protegido</p>
+            </div>
+
+            <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                <div class="space-y-1 text-left">
+                    <label for="loginPinInput" class="text-xs font-bold text-slate-700">Digite seu PIN / Senha:</label>
+                    <input type="password" id="loginPinInput" maxlength="6" autofocus placeholder="••••" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-center text-xl font-bold tracking-widest text-slate-800 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 transition-all">
+                </div>
+
+                <div id="loginErrorMsg" class="hidden text-xs font-bold text-rose-600 bg-rose-50 p-2.5 rounded-xl border border-rose-200">
+                    PIN incorreto. Tente novamente! (Padrão: 1234)
+                </div>
+
+                <button type="submit" class="w-full py-3.5 gold-gradient hover:opacity-95 text-white font-bold text-sm rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fas fa-lock-open"></i>
+                    <span>Entrar no Consultório</span>
+                </button>
+            </form>
+
+            <p class="text-[11px] text-slate-400">PIN padrão do sistema: <strong class="text-slate-600">1234</strong></p>
+        </div>
+    </div>
+
+    <!-- CABEÇALHO SUPERIOR FIXO -->
+    <header id="topHeader" class="flex items-center justify-between px-4 md:px-6">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="w-10 h-10 rounded-xl hover:bg-slate-100 text-slate-700 flex items-center justify-center text-lg transition-colors cursor-pointer" title="Alternar Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div onclick="window.location.reload()" class="flex items-center gap-2.5 cursor-pointer group" title="Recarregar Página">
+                <div class="w-9 h-9 rounded-xl gold-gradient flex items-center justify-center text-white text-xl font-bold shadow-xs group-hover:scale-105 transition-transform">
+                    Ψ
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-lg font-black text-slate-800 leading-none">PsicAPP</span>
+                    <span class="mt-1 text-[10px] font-bold text-gold-600 tracking-wider">PSICOLOGIA</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <span id="headerCurrentDate" class="hidden sm:inline-block text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-xl">
+                --
+            </span>
+
+            <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+                <div class="w-8 h-8 rounded-full bg-gold-100 border border-gold-300 text-gold-700 flex items-center justify-center font-bold text-xs">
+                    AM
+                </div>
+                <div class="hidden lg:flex flex-col text-left">
+                    <span id="headerTherapistName" class="text-xs font-bold text-slate-800 leading-tight">Dra. Anndreane Maliqui</span>
+                    <span id="headerTherapistCRP" class="text-[10px] text-slate-400">CRP 06/123456</span>
+                </div>
+            </div>
+
+            <button onclick="lockSystem()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-500 flex items-center justify-center text-xs transition-colors cursor-pointer" title="Bloquear Consultório">
+                <i class="fas fa-lock"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- WRAPPER PRINCIPAL -->
+    <div id="mainWrapper" class="flex-1 flex sidebar-expanded">
+
+        <!-- MENU LATERAL FIXO -->
+        <aside id="mainSidebar" class="w-60 flex flex-col justify-between py-4">
+            <nav class="space-y-1.5 px-3">
+                <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="sidebar-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs font-bold transition-all bg-gold-50 text-gold-800 border border-gold-200 cursor-pointer">
+                    <i class="fas fa-chart-pie text-gold-500 text-base shrink-0"></i>
+                    <span class="nav-text truncate">Dashboard</span>
+                </button>
+
+                <button onclick="navigateTo('agenda')" id="nav-agenda" class="sidebar-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs font-bold transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900 cursor-pointer">
+                    <i class="fas fa-calendar-alt text-gold-500 text-base shrink-0"></i>
+                    <span class="nav-text truncate">Agenda</span>
+                </button>
+
+                <button onclick="navigateTo('prontuario')" id="nav-prontuario" class="sidebar-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs font-bold transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900 cursor-pointer">
+                    <i class="fas fa-folder-open text-gold-500 text-base shrink-0"></i>
+                    <span class="nav-text truncate">Prontuário Eletrônico</span>
+                </button>
+
+                <button onclick="navigateTo('financeiro')" id="nav-financeiro" class="sidebar-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs font-bold transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900 cursor-pointer">
+                    <i class="fas fa-wallet text-gold-500 text-base shrink-0"></i>
+                    <span class="nav-text truncate">Financeiro & Recibos</span>
+                </button>
+
+                <button onclick="navigateTo('backup')" id="nav-backup" class="sidebar-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs font-bold transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900 cursor-pointer">
+                    <i class="fas fa-cloud-upload-alt text-gold-500 text-base shrink-0"></i>
+                    <span class="nav-text truncate">Backup & Nuvem</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
+        <main id="mainContent" class="flex-1 p-4 md:p-6 overflow-y-auto max-w-7xl mx-auto w-full space-y-6">
+
+            <!-- ABA 1: DASHBOARD -->
+            <div id="tab-dashboard" class="tab-content space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-pastel-border shadow-xs">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-chart-pie text-gold-600"></i> Painel Geral do Consultório
+                        </h1>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                            Indicadores em tempo real do consultório e pacientes ativos.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="refreshDashboardData()" class="px-3.5 py-2 text-xs font-semibold bg-pastel-bg hover:bg-gold-50 text-gold-700 border border-gold-200 rounded-xl transition-colors flex items-center gap-2 cursor-pointer">
+                            <i class="fas fa-sync-alt"></i> Atualizar Dados
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARDS DE MÉTRICAS (KPIs) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs hover:border-gold-300 transition-all">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pacientes Ativos</span>
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-lg">
+                                <i class="fas fa-user-friends"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="kpiTotalPatients" class="text-2xl font-extrabold text-slate-800">0</span>
+                            <span class="text-xs text-emerald-600 font-medium"><i class="fas fa-check"></i> Cadastrados</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">Com histórico de prontuário</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs hover:border-gold-300 transition-all">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Consultas no Mês</span>
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center text-lg">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="kpiMonthSessions" class="text-2xl font-extrabold text-slate-800">0</span>
+                            <span class="text-xs text-blue-600 font-medium"><i class="fas fa-clock"></i> Agendadas</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">Sessões programadas</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs hover:border-gold-300 transition-all">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Receita Recebida</span>
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-lg">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="kpiReceivedAmount" class="text-xl sm:text-2xl font-extrabold text-emerald-700">R$ 0,00</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">Pagamentos confirmados</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs hover:border-gold-300 transition-all">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Valores Pendentes</span>
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-lg">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span id="kpiPendingAmount" class="text-xl sm:text-2xl font-extrabold text-amber-600">R$ 0,00</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">A receber das sessões</p>
+                    </div>
+                </div>
+
+                <!-- GRÁFICOS INTERATIVOS -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs flex flex-col justify-between space-y-3">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2 mb-3">
+                                <i class="fas fa-calendar-day text-gold-600"></i> Próximos Atendimentos
+                            </h3>
+                            <div id="dashboardUpcomingList" class="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+                                <!-- Preenchido dinamicamente via JS -->
+                            </div>
+                        </div>
+
+                        <button onclick="navigateTo('agenda')" class="w-full py-2.5 bg-pastel-bg hover:bg-gold-100 text-gold-800 text-xs font-bold rounded-xl border border-gold-200 transition-colors text-center flex items-center justify-center gap-2 cursor-pointer">
+                            <span>Ver Agenda Completa</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-pastel-border shadow-xs space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fas fa-chart-bar text-gold-600"></i> Histórico de Atendimentos Mensais
+                            </h3>
+                            <span class="text-xs text-slate-400 font-medium">Agosto 2026 em diante</span>
+                        </div>
+                        <div class="h-64 relative">
+                            <canvas id="chartSessionsMonth"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-pastel-border shadow-xs space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fas fa-line-chart text-gold-600"></i> Evolução Financeira (Recebido vs Pendente)
+                            </h3>
+                        </div>
+                        <div class="h-64 relative">
+                            <canvas id="chartFinancialLine"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fas fa-chart-pie text-gold-600"></i> Status das Consultas
+                            </h3>
+                        </div>
+                        <div class="h-64 relative flex items-center justify-center">
+                            <canvas id="chartSessionsStatus"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 2: AGENDA INTELIGENTE -->
+            <div id="tab-agenda" class="tab-content space-y-6 hidden">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-pastel-border shadow-xs">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gold-100 text-gold-700 flex items-center justify-center text-lg">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-slate-800">Agenda de Atendimentos</h1>
+                            <p class="text-xs text-slate-500">Ajuste horários, arraste cards, agende sessões recorrentes e lembretes.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200">
+                            <button id="btnViewDay" onclick="setAgendaView('dia')" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all bg-white text-gold-800 shadow-xs border border-gold-200 cursor-pointer">
+                                <i class="fas fa-calendar-day mr-1"></i> Dia
+                            </button>
+                            <button id="btnViewWeek" onclick="setAgendaView('semana')" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-800 cursor-pointer">
+                                <i class="fas fa-calendar-week mr-1"></i> Semana
+                            </button>
+                        </div>
+
+                        <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl p-1">
+                            <button onclick="navigateAgenda(-1)" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-600 text-xs transition-colors cursor-pointer" title="Anterior">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button onclick="navigateAgendaToday()" class="px-3 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors cursor-pointer">
+                                Hoje
+                            </button>
+                            <button onclick="navigateAgenda(1)" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-600 text-xs transition-colors cursor-pointer" title="Próximo">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+
+                        <input type="date" id="agendaDatePicker" onchange="onAgendaDatePick(this.value)" class="px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-medium text-slate-700 focus:ring-2 focus:ring-gold-400 focus:outline-none cursor-pointer">
+
+                        <button onclick="openNewAppointmentModal()" class="px-4 py-2 gold-gradient text-white text-xs font-bold rounded-xl shadow-xs hover:opacity-95 transition-opacity flex items-center gap-2 cursor-pointer">
+                            <i class="fas fa-plus"></i>
+                            <span>Nova Consulta</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between px-1">
+                    <h2 id="agendaPeriodTitle" class="text-lg font-bold text-slate-800">Carregando...</h2>
+                    <span class="text-xs text-slate-500 bg-amber-50 text-amber-800 px-3 py-1 rounded-full border border-amber-200 hidden sm:inline-block">
+                        💡 Arraste os cards para trocar de horário ou dia
+                    </span>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-pastel-border shadow-xs overflow-hidden">
+                    <div id="agendaDayView" class="p-4 sm:p-6 space-y-3">
+                        <div id="dayGridContainer" class="space-y-3"></div>
+                    </div>
+
+                    <div id="agendaWeekView" class="p-4 sm:p-6 overflow-x-auto hidden">
+                        <div id="weekGridContainer" class="grid grid-cols-1 md:grid-cols-7 gap-3 min-w-[700px]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 3: PRONTUÁRIO ELETRÔNICO -->
+            <div id="tab-prontuario" class="tab-content space-y-6 hidden">
+                <div class="bg-white rounded-2xl border border-pastel-border shadow-sm overflow-hidden transition-all">
+                    <div class="p-4 bg-pastel-subtle/50 border-b border-pastel-border flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-gold-100 text-gold-600 flex items-center justify-center">
+                                <i class="fa-solid fa-users text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-gray-800">Seleção de Paciente</h3>
+                                <p class="text-[11px] text-gray-500">Busque e selecione para abrir o prontuário completo</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="openPatientModal()" class="text-xs font-bold gold-gradient text-white px-3 py-1.5 rounded-xl shadow-xs transition flex items-center gap-1.5 hover:opacity-95 cursor-pointer">
+                                <i class="fa-solid fa-plus text-[11px]"></i>
+                                <span>Novo Paciente</span>
+                            </button>
+                            <button onclick="togglePatientSearchCard()" id="btnTogglePatientSearch" class="text-xs font-semibold text-gold-700 hover:text-gold-800 bg-white border border-pastel-border px-3 py-1.5 rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
+                                <span id="txtTogglePatientCard">Recolher Lista</span>
+                                <i id="iconTogglePatientCard" class="fa-solid fa-chevron-up"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="patientSearchBody" class="p-4 space-y-4">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-sm"></i>
+                            <input type="text" id="prontuarioSearchInput" oninput="filterPatientsProntuario()" placeholder="Pesquisar por nome do paciente, CPF ou queixa..." class="w-full pl-10 pr-4 py-2.5 text-xs rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold-500 bg-gray-50/50">
+                        </div>
+
+                        <div id="prontuarioPatientGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 max-h-48 overflow-y-auto pr-1">
+                            <!-- Renderizado via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="patientSummaryCard" class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs">
+                    <!-- Preenchido via JS -->
+                </div>
+
+                <!-- CARD NOVA / EDITAR EVOLUÇÃO CLÍNICA -->
+                <div id="evolutionFormCard" class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square text-gold-600"></i>
+                            <h3 id="evoFormTitle" class="text-sm font-bold text-slate-800">Nova Evolução Clínica</h3>
+                        </div>
+                        <span class="text-xs text-emerald-800 font-medium bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1">
+                            <i class="fa-solid fa-shield-halved text-emerald-600"></i>
+                            <span>Criptografado (AES-256)</span>
+                        </span>
+                    </div>
+
+                    <input type="hidden" id="editingEvoId" value="">
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-600 mb-1">Modelo de Registro</label>
+                            <select id="evoModelSelect" onchange="changeEvoTemplate()" class="w-full text-xs rounded-xl border border-gray-300 p-2.5 bg-white focus:ring-2 focus:ring-gold-500 focus:outline-none">
+                                <option value="TCC">TCC (Pensamentos / Comportamento)</option>
+                                <option value="Psicanálise">Psicanálise / Psicodinâmica</option>
+                                <option value="Anamnese">Anamnese Geral</option>
+                                <option value="Livre">Texto Livre / Evolução Simples</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-600 mb-1">Data da Consulta</label>
+                            <input type="date" id="evoDateInput" class="w-full text-xs rounded-xl border border-gray-300 p-2.5 bg-white focus:ring-2 focus:ring-gold-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-600 mb-1">Humor / Estado Afetivo</label>
+                            <select id="evoMoodInput" class="w-full text-xs rounded-xl border border-gray-300 p-2.5 bg-white focus:ring-2 focus:ring-gold-500 focus:outline-none">
+                                <option value="Tranquilo / Calmo">Tranquilo / Calmo</option>
+                                <option value="Ansioso / Agitado">Ansioso / Agitado</option>
+                                <option value="Triste / Deprimido">Triste / Deprimido</option>
+                                <option value="Exausto / Estressado">Exausto / Estressado</option>
+                                <option value="Motivado / Confiante">Motivado / Confiante</option>
+                                <option value="Estável / Eutímico">Estável / Eutímico</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-600 mb-1">Registro da Sessão / Anotações Clínicas</label>
+                        <textarea id="evoContentTextarea" rows="4" placeholder="Descreva os pontos trabalhados, intervenções e condutas..." class="w-full text-xs rounded-xl border border-gray-300 p-3 bg-white focus:ring-2 focus:ring-gold-500 focus:outline-none" style="height: 120px;"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2">
+                        <button type="button" id="btnCancelEditEvo" onclick="cancelEditEvolution()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl hidden cursor-pointer">
+                            Cancelar Edição
+                        </button>
+                        <button onclick="saveClinicalEvolution()" class="psi-gold-gradient text-white text-xs font-semibold px-5 py-2.5 rounded-xl shadow hover:opacity-95 transition flex items-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-floppy-disk"></i> <span id="btnSaveEvoText">Salvar Evolução</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-history text-gold-600"></i>
+                            <h3 class="text-sm font-bold text-slate-800">Histórico de Evoluções Clínicas</h3>
+                        </div>
+                        <span class="text-xs text-slate-500 font-medium bg-slate-100 px-2.5 py-1 rounded-full">
+                            Ordem: <strong class="text-slate-700">Mais Recente → Mais Antigo</strong>
+                        </span>
+                    </div>
+
+                    <div id="evolutionTimeline" class="space-y-4">
+                        <!-- Renderizado dinamicamente via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 4: MÓDULO FINANCEIRO & RECIBOS -->
+            <div id="tab-financeiro" class="tab-content space-y-6 hidden">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-pastel-border shadow-xs">
+                        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold mb-2">
+                            <span>Faturamento Total</span>
+                            <i class="fas fa-coins text-gold-600"></i>
+                        </div>
+                        <div id="finKpiTotal" class="text-2xl font-black text-slate-800">R$ 0,00</div>
+                        <p class="text-[11px] text-slate-400 mt-1">Sessões & Pacotes</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-pastel-border shadow-xs">
+                        <div class="flex items-center justify-between text-emerald-600 text-xs font-semibold mb-2">
+                            <span>Recebido / Pago</span>
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div id="finKpiPago" class="text-2xl font-black text-emerald-700">R$ 0,00</div>
+                        <p class="text-[11px] text-emerald-600 mt-1">Confirmado em conta</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-pastel-border shadow-xs">
+                        <div class="flex items-center justify-between text-amber-600 text-xs font-semibold mb-2">
+                            <span>Pendente / A Receber</span>
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div id="finKpiPendente" class="text-2xl font-black text-amber-600">R$ 0,00</div>
+                        <p class="text-[11px] text-amber-600 mt-1">Aguardando pagamento</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-pastel-border shadow-xs">
+                        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold mb-2">
+                            <span>Recibos Emitidos</span>
+                            <i class="fas fa-file-invoice-dollar text-gold-600"></i>
+                        </div>
+                        <div id="finKpiRecibosCount" class="text-2xl font-black text-slate-800">0</div>
+                        <p class="text-[11px] text-slate-400 mt-1">Documentos em PDF</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs space-y-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fas fa-receipt text-gold-600"></i>
+                                <span>Lançamentos e Controle Financeiro</span>
+                            </h3>
+                            <p class="text-xs text-slate-500">Acompanhe os pagamentos das consultas e gere recibos de reembolso.</p>
+                        </div>
+                        
+                        <button onclick="openNewTransactionModal()" class="px-4 py-2 gold-gradient hover:opacity-95 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-2 self-start md:self-auto cursor-pointer">
+                            <i class="fas fa-plus"></i>
+                            <span>Novo Lançamento</span>
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div class="flex items-center gap-2 w-full sm:w-auto flex-1 max-w-xs">
+                            <i class="fas fa-search text-slate-400 text-xs pl-1"></i>
+                            <input type="text" id="finSearchInput" oninput="renderFinancialTable()" placeholder="Pesquisar por Nome ou CPF..." class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:border-gold-400">
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-semibold text-slate-600 whitespace-nowrap">Paciente:</span>
+                                <select id="finPatientFilter" onchange="renderFinancialTable()" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:border-gold-400 cursor-pointer">
+                                    <option value="ALL">Todos os Pacientes</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-semibold text-slate-600 whitespace-nowrap">Status:</span>
+                                <select id="finStatusFilter" onchange="renderFinancialTable()" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:border-gold-400 cursor-pointer">
+                                    <option value="ALL">Todos os Status</option>
+                                    <option value="pago">Apenas Pagos</option>
+                                    <option value="pendente">Apenas Pendentes</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100/80 text-slate-600 font-bold border-b border-slate-200">
+                                    <th class="p-3">Data</th>
+                                    <th class="p-3">Paciente / CPF</th>
+                                    <th class="p-3">Descrição / Sessão</th>
+                                    <th class="p-3">Valor</th>
+                                    <th class="p-3 text-center">Status</th>
+                                    <th class="p-3 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="financialTableBody" class="divide-y divide-slate-100">
+                                <!-- Renderizado via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 5: BACKUP & CONFIGURAÇÕES -->
+            <div id="tab-backup" class="tab-content space-y-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gold-100 text-gold-700 flex items-center justify-center text-lg">
+                                <i class="fas fa-file-export"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800">Backup Local do Sistema</h3>
+                                <p class="text-xs text-slate-500">Exportação em arquivo .JSON protegido</p>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Guarde uma cópia de segurança física no seu computador. Todos os dados de prontuários, contatos, agenda e finanças são salvos em formato estruturado.
+                        </p>
+
+                        <div class="space-y-3 pt-2">
+                            <button onclick="exportFullSystemBackup()" class="w-full py-3 gold-gradient hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fas fa-download"></i>
+                                <span>Baixar Backup Completo (.JSON)</span>
+                            </button>
+
+                            <div class="border-t border-slate-100 pt-3">
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Restaurar Banco de Dados via Arquivo:</label>
+                                <input type="file" id="importJsonFileInput" accept=".json" onchange="importFullSystemBackup(event)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer">
+                            </div>
+
+                            <button onclick="resetToDefaultData()" class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs rounded-xl border border-rose-200 transition-colors text-center cursor-pointer">
+                                <i class="fas fa-undo mr-1"></i> Restaurar Dados Padrão (Seed)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-lg">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800">Sincronização Nuvem (AES-256)</h3>
+                                <p class="text-xs text-slate-500">Pronto para integração com banco de dados remoto</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-600">Status da Camada de Dados:</span>
+                                <span id="cloudStatusBadge" class="text-emerald-600 font-bold flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Repositório Ativo
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between text-slate-500 text-[11px]">
+                                <span>Última Sincronização:</span>
+                                <span id="lastCloudSyncTime">Hoje, às 08:30</span>
+                            </div>
+                        </div>
+
+                        <button onclick="triggerCloudSync()" class="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fas fa-sync-alt" id="cloudSyncIcon"></i>
+                            <span>Sincronizar Agora</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-pastel-border shadow-xs space-y-4">
+                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-user-cog text-gold-600"></i>
+                        <span>Dados do Consultório & Profissional</span>
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Nome da Terapeuta/Psicóloga:</label>
+                            <input type="text" id="cfgTherapistName" value="Dra. Anndreane Maliqui" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-gold-400">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Registro Profissional (CRP):</label>
+                            <input type="text" id="cfgTherapistCRP" value="CRP 06/123456" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-gold-400">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">CPF Profissional:</label>
+                            <input type="text" id="cfgTherapistCPF" value="123.456.789-00" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-gold-400">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Endereço do Consultório:</label>
+                            <input type="text" id="cfgTherapistAddress" value="Santana - São Paulo/SP" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-gold-400">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">PIN de Acesso ao Sistema:</label>
+                            <input type="password" id="cfgTherapistPIN" value="1234" maxlength="6" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-gold-400">
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex justify-end">
+                        <button onclick="saveTherapistConfig()" class="px-5 py-2.5 gold-gradient hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer">
+                            Salvar Alterações de Configuração
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- RODAPÉ INSTITUCIONAL -->
+    <footer class="bg-white border-t border-pastel-border py-4 px-6 text-center text-xs text-slate-400 z-30">
+        <p class="font-medium">PsicAPP © 2026 • Gestão Clínica para Psicologia • Proteção de Dados LGPD</p>
+    </footer>
+
+    <!-- MODAIS E DIÁLOGOS -->
+    <!-- Modal Cadastro/Edição de Paciente -->
+    <div id="patientModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-lg rounded-3xl border border-pastel-border shadow-xl p-6 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-user-plus text-gold-600"></i> Cadastrar / Editar Paciente
+                </h3>
+                <button onclick="closePatientModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form onsubmit="savePatient(event)" class="space-y-3">
+                <input type="hidden" id="patientFormId">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nome Completo do Paciente *</label>
+                    <input type="text" id="patientName" required placeholder="Ex: Ana Clara Silva" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">CPF</label>
+                        <input type="text" id="patientCpf" placeholder="000.000.000-00" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Telefone / WhatsApp</label>
+                        <input type="text" id="patientPhone" placeholder="(11) 99999-9999" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">E-mail</label>
+                        <input type="email" id="patientEmail" placeholder="paciente@email.com" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Data de Nascimento</label>
+                        <input type="date" id="patientBirthDate" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Profissão</label>
+                        <input type="text" id="patientProfession" placeholder="Engenheiro" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Frequência</label>
+                        <select id="patientFrequency" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                            <option value="Semanal">Semanal</option>
+                            <option value="Quinzenal">Quinzenal</option>
+                            <option value="Mensal">Mensal</option>
+                            <option value="Avulso">Avulso</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Valor Sessão (R$)</label>
+                        <input type="number" id="patientValue" value="220" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Observações / Demanda Inicial</label>
+                    <textarea id="patientNotes" rows="2" placeholder="Queixas principais, medicação, observações..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none"></textarea>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closePatientModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 gold-gradient hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer">
+                        Salvar Paciente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Nova/Editar Consulta (Com campo de Recorrência e Pesquisa) -->
+    <div id="appointmentModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-md rounded-3xl border border-pastel-border shadow-xl p-6 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 id="appModalTitle" class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-calendar-plus text-gold-600"></i> Agendar Consulta
+                </h3>
+                <button onclick="closeAppointmentModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAppointmentSubmit(event)" class="space-y-3">
+                <input type="hidden" id="appModalId">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Selecione o Paciente:</label>
+                    <select id="appModalPatient" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                        <!-- Preenchido via JS -->
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Data Inicial:</label>
+                        <input type="date" id="appModalDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Horário:</label>
+                        <input type="time" id="appModalTime" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Frequência / Recorrência Automática:</label>
+                    <select id="appModalFrequency" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                        <option value="Avulso">Avulso (Sessão Única)</option>
+                        <option value="Semanal">Semanal (Projetar próximos 3 meses)</option>
+                        <option value="Quinzenal">Quinzenal (Projetar próximos 3 meses)</option>
+                        <option value="Mensal">Mensal (Projetar próximos 3 meses)</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Valor da Sessão (R$):</label>
+                        <input type="number" id="appModalPrice" value="220" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Status:</label>
+                        <select id="appModalStatus" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-gold-400 focus:outline-none">
+                            <option value="Agendado">Agendado</option>
+                            <option value="Atendido">Atendido</option>
+                            <option value="Falta">Falta</option>
+                            <option value="Cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeAppointmentModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 gold-gradient hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer">
+                        Salvar Agendamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Novo Lançamento Financeiro -->
+    <div id="transactionModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-md rounded-3xl border border-pastel-border shadow-xl p-6 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-coins text-gold-600"></i> Novo Lançamento Financeiro
+                </h3>
+                <button onclick="closeTransactionModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleTransactionSubmit(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Paciente:</label>
+                    <select id="txModalPatient" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-gold-400">
+                        <!-- Preenchido via JS -->
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Data:</label>
+                        <input type="date" id="txModalDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-gold-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Valor (R$):</label>
+                        <input type="number" id="txModalAmount" value="220" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-gold-400">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Descrição / Serviço:</label>
+                    <input type="text" id="txModalDesc" value="Sessão de Psicoterapia Individual" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-gold-400">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Status do Pagamento:</label>
+                    <select id="txModalStatus" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-gold-400">
+                        <option value="pago">Pago (Confirmado em Conta)</option>
+                        <option value="pendente">Pendente (A Receber)</option>
+                    </select>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 gold-gradient hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer">
+                        Salvar Lançamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Recibo de Reembolso -->
+    <div id="receiptModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-lg rounded-3xl border border-pastel-border shadow-2xl p-8 space-y-6">
+            <div id="receiptPrintArea" class="space-y-6 text-slate-800 p-2">
+                <div class="text-center border-b border-slate-200 pb-4">
+                    <div class="w-12 h-12 mx-auto rounded-xl gold-gradient flex items-center justify-center text-white text-2xl font-black mb-2">
+                        Ψ
+                    </div>
+                    <h2 class="text-xl font-bold tracking-tight text-slate-900">RECIBO DE PAGAMENTO</h2>
+                    <p class="text-xs text-slate-500 mt-1">Serviços de Psicoterapia e Saúde Mental</p>
+                </div>
+
+                <div class="space-y-3 text-xs leading-relaxed">
+                    <p>
+                        Recebi de <strong id="rcptPatientName" class="text-slate-900 uppercase">--</strong>, 
+                        CPF nº <span id="rcptPatientCPF">--</span>, a quantia de 
+                        <strong id="rcptAmount" class="text-slate-900 text-sm">R$ 0,00</strong>.
+                    </p>
+                    <p>
+                        Referente a: <span id="rcptDesc" class="italic">Sessão de Psicoterapia Individual</span> 
+                        realizada em <span id="rcptDate">--</span>.
+                    </p>
+                </div>
+
+                <div class="pt-8 border-t border-slate-200 text-center space-y-1">
+                    <p id="rcptTherapistName" class="font-bold text-xs text-slate-900">Dra. Anndreane Maliqui</p>
+                    <p id="rcptTherapistCRP" class="text-[11px] text-slate-500">Psicóloga Clínica • CRP 06/123456</p>
+                    <p id="rcptTherapistCPF" class="text-[11px] text-slate-500">CPF: 123.456.789-00</p>
+                    <p id="rcptTherapistAddress" class="text-[10px] text-slate-400 mt-1">Santana - São Paulo/SP</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                <button onclick="closeReceiptModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer">
+                    Fechar
+                </button>
+                <button onclick="window.print()" class="px-5 py-2 gold-gradient hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-2 cursor-pointer">
+                    <i class="fas fa-print"></i>
+                    <span>Imprimir / PDF</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CARREGAMENTO DOS MÓDULOS DE DADOS E REGRA DE NEGÓCIO -->
+    <script src="js/data_seed.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/agenda.js"></script>
+    <script src="js/prontuario.js"></script>
+    <script src="js/financeiro.js"></script>
+    <script src="js/backup.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
